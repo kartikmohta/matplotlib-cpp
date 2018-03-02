@@ -1,6 +1,6 @@
 #define _USE_MATH_DEFINES
 #include <cmath>
-#include "../matplotlibcpp.h"
+#include "matplotlibcpp/matplotlibcpp.h"
 
 namespace plt = matplotlibcpp;
 
@@ -8,6 +8,8 @@ int main()
 {
 	int n = 1000;
 	std::vector<double> x, y, z;
+
+  plt::init(); // Required for Python 3 (doesn't hurt for Python 2)
 
 	for(int i=0; i<n; i++) {
 		x.push_back(i*i);

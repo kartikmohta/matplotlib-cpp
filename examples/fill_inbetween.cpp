@@ -1,5 +1,5 @@
 #define _USE_MATH_DEFINES
-#include "../matplotlibcpp.h"
+#include "matplotlibcpp/matplotlibcpp.h"
 #include <cmath>
 #include <iostream>
 
@@ -23,6 +23,7 @@ int main() {
   keywords["color"] = "grey";
   keywords["hatch"] = "-";
 
+  plt::init(); // Required for Python 3 (doesn't hurt for Python 2)
   plt::fill_between(x, y, z, keywords);
   plt::show();
 }

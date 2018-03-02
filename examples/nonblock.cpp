@@ -1,6 +1,6 @@
 #define _USE_MATH_DEFINES
 #include <cmath>
-#include "../matplotlibcpp.h"
+#include "matplotlibcpp/matplotlibcpp.h"
 
 namespace plt = matplotlibcpp;
 
@@ -18,6 +18,8 @@ int main()
         y.at(i) = sin(2*M_PI*i/360.0);
         z.at(i) = log(i);
     }
+
+    plt::init(); // Required for Python 3 (doesn't hurt for Python 2)
 
     // Plot line from given x and y data. Color is selected automatically.
     plt::subplot(2,2,1);
@@ -40,6 +42,7 @@ int main()
     plt::legend();
 
     plt::show(false);
+    plt::pause(0.1);
 
     cout << "matplotlibcpp::show() is working in an non-blocking mode" << endl;
     getchar();

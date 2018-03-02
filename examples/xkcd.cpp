@@ -1,4 +1,4 @@
-#include "../matplotlibcpp.h"
+#include "matplotlibcpp/matplotlibcpp.h"
 #include <vector>
 #include <cmath>
 
@@ -13,6 +13,7 @@ int main() {
         x[i] = sin(2.0 * M_PI * 1.0 * t[i]);
     }
 
+    plt::init(); // Required for Python 3 (doesn't hurt for Python 2)
     plt::xkcd();
     plt::plot(t, x);
     plt::title("AN ORDINARY SIN WAVE");
