@@ -2,12 +2,15 @@ cmake_minimum_required(VERSION 3.0)
 
 project(matplotlibcpp VERSION 0.1.0 LANGUAGES CXX)
 
+LIST(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+
 find_package(PythonLibs REQUIRED)
+find_package(NumPy REQUIRED) # In case numpy headers are at non-standard locations
 
 add_library(${PROJECT_NAME} INTERFACE)
 target_include_directories(${PROJECT_NAME} INTERFACE
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
-target_include_directories(${PROJECT_NAME} INTERFACE ${PYTHON_INCLUDE_DIRS})
+target_include_directories(${PROJECT_NAME} INTERFACE ${PYTHON_INCLUDE_DIRS} ${NUMPY_INCLUDE_DIRS})
 target_link_libraries(${PROJECT_NAME} INTERFACE ${PYTHON_LIBRARIES})
 
 install(TARGETS ${PROJECT_NAME} EXPORT "${PROJECT_NAME}Targets"
