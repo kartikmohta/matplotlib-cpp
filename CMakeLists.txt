@@ -26,12 +26,16 @@ install(DIRECTORY "include/${PROJECT_NAME}"
   PATTERN ".svn" EXCLUDE
   )
 
+install(FILES cmake/FindNumPy.cmake
+  DESTINATION "share/${PROJECT_NAME}/cmake"
+  )
+
 include(cmake/GenerateAndInstallConfig.cmake)
 generate_and_install_config_file(
   INCLUDE_DIRS "include"
   LIBRARIES
-  DEPS PythonLibs
-  DEPS_INCLUDE_DIRS PYTHON
+  DEPS PythonLibs NumPy
+  DEPS_INCLUDE_DIRS PYTHON NumPy
   DEPS_LIBRARIES PYTHON
   )
 
