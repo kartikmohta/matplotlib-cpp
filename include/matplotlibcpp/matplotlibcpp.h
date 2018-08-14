@@ -729,8 +729,7 @@ inline void figure_size(size_t w, size_t h)
     PyDict_SetItemString(kwargs, "figsize", size);
     PyDict_SetItemString(kwargs, "dpi", PyLong_FromSize_t(dpi));
 
-    PyObject* res = PyObject_Call(detail::_interpreter::get().s_python_function_figure, 
-            detail::_interpreter::get().s_python_empty_tuple, kwargs);
+    PyObject* res = PyObject_Call(detail::_interpreter::get().python_functions["figure"], detail::_interpreter::get().s_python_empty_tuple, kwargs);
 
     Py_DECREF(kwargs);
 
