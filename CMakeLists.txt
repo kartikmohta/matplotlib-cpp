@@ -10,7 +10,7 @@ find_package(NumPy REQUIRED) # In case numpy headers are at non-standard locatio
 add_library(${PROJECT_NAME} INTERFACE)
 target_include_directories(${PROJECT_NAME} INTERFACE
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
-target_include_directories(${PROJECT_NAME} INTERFACE ${PYTHON_INCLUDE_DIRS} ${NUMPY_INCLUDE_DIRS})
+target_include_directories(${PROJECT_NAME} INTERFACE ${PYTHON_INCLUDE_DIRS} ${NumPy_INCLUDE_DIRS})
 target_link_libraries(${PROJECT_NAME} INTERFACE ${PYTHON_LIBRARIES})
 
 install(TARGETS ${PROJECT_NAME} EXPORT "${PROJECT_NAME}Targets"

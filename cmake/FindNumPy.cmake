@@ -4,13 +4,13 @@
 #
 # TODO: Update to provide the libraries and paths for linking npymath lib.
 #
-#  NUMPY_FOUND               - was NumPy found
-#  NUMPY_VERSION             - the version of NumPy found as a string
-#  NUMPY_VERSION_MAJOR       - the major version number of NumPy
-#  NUMPY_VERSION_MINOR       - the minor version number of NumPy
-#  NUMPY_VERSION_PATCH       - the patch version number of NumPy
-#  NUMPY_VERSION_DECIMAL     - e.g. version 1.6.1 is 10601
-#  NUMPY_INCLUDE_DIRS        - path to the NumPy include files
+#  NumPy_FOUND               - was NumPy found
+#  NumPy_VERSION             - the version of NumPy found as a string
+#  NumPy_VERSION_MAJOR       - the major version number of NumPy
+#  NumPy_VERSION_MINOR       - the minor version number of NumPy
+#  NumPy_VERSION_PATCH       - the patch version number of NumPy
+#  NumPy_VERSION_DECIMAL     - e.g. version 1.6.1 is 10601
+#  NumPy_INCLUDE_DIRS        - path to the NumPy include files
 
 #============================================================================
 # Copyright 2012 Continuum Analytics, Inc.
@@ -46,57 +46,56 @@ else()
 endif()
 
 if(NOT PYTHONINTERP_FOUND)
-    set(NUMPY_FOUND FALSE)
+    set(NumPy_FOUND FALSE)
     return()
 endif()
 
 execute_process(COMMAND "${PYTHON_EXECUTABLE}" "-c"
     "import numpy as n; print(n.__version__); print(n.get_include());"
-    RESULT_VARIABLE _NUMPY_SEARCH_SUCCESS
-    OUTPUT_VARIABLE _NUMPY_VALUES_OUTPUT
-    ERROR_VARIABLE _NUMPY_ERROR_VALUE
+    RESULT_VARIABLE _NumPy_SEARCH_SUCCESS
+    OUTPUT_VARIABLE _NumPy_VALUES_OUTPUT
+    ERROR_VARIABLE _NumPy_ERROR_VALUE
     OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-if(NOT _NUMPY_SEARCH_SUCCESS MATCHES 0)
+if(NOT _NumPy_SEARCH_SUCCESS MATCHES 0)
     if(NumPy_FIND_REQUIRED)
         message(FATAL_ERROR
-            "NumPy import failure:\n${_NUMPY_ERROR_VALUE}")
+            "NumPy import failure:\n${_NumPy_ERROR_VALUE}")
     endif()
-    set(NUMPY_FOUND FALSE)
+    set(NumPy_FOUND FALSE)
     return()
 endif()
 
 # Convert the process output into a list
-string(REGEX REPLACE ";" "\\\\;" _NUMPY_VALUES ${_NUMPY_VALUES_OUTPUT})
-string(REGEX REPLACE "\n" ";" _NUMPY_VALUES ${_NUMPY_VALUES})
+string(REGEX REPLACE ";" "\\\\;" _NumPy_VALUES ${_NumPy_VALUES_OUTPUT})
+string(REGEX REPLACE "\n" ";" _NumPy_VALUES ${_NumPy_VALUES})
 # Just in case there is unexpected output from the Python command.
-list(GET _NUMPY_VALUES -2 NUMPY_VERSION)
-list(GET _NUMPY_VALUES -1 NUMPY_INCLUDE_DIRS)
+list(GET _NumPy_VALUES -2 NumPy_VERSION)
+list(GET _NumPy_VALUES -1 NumPy_INCLUDE_DIRS)
 
-string(REGEX MATCH "^[0-9]+\\.[0-9]+\\.[0-9]+" _VER_CHECK "${NUMPY_VERSION}")
+string(REGEX MATCH "^[0-9]+\\.[0-9]+\\.[0-9]+" _VER_CHECK "${NumPy_VERSION}")
 if("${_VER_CHECK}" STREQUAL "")
     # The output from Python was unexpected. Raise an error always
     # here, because we found NumPy, but it appears to be corrupted somehow.
     message(FATAL_ERROR
-        "Requested version and include path from NumPy, got instead:\n${_NUMPY_VALUES_OUTPUT}\n")
+        "Requested version and include path from NumPy, got instead:\n${_NumPy_VALUES_OUTPUT}\n")
     return()
 endif()
 
 # Make sure all directory separators are '/'
-string(REGEX REPLACE "\\\\" "/" NUMPY_INCLUDE_DIRS ${NUMPY_INCLUDE_DIRS})
+string(REGEX REPLACE "\\\\" "/" NumPy_INCLUDE_DIRS ${NumPy_INCLUDE_DIRS})
 
 # Get the major and minor version numbers
-string(REGEX REPLACE "\\." ";" _NUMPY_VERSION_LIST ${NUMPY_VERSION})
-list(GET _NUMPY_VERSION_LIST 0 NUMPY_VERSION_MAJOR)
-list(GET _NUMPY_VERSION_LIST 1 NUMPY_VERSION_MINOR)
-list(GET _NUMPY_VERSION_LIST 2 NUMPY_VERSION_PATCH)
-string(REGEX MATCH "[0-9]*" NUMPY_VERSION_PATCH ${NUMPY_VERSION_PATCH})
-math(EXPR NUMPY_VERSION_DECIMAL
-    "(${NUMPY_VERSION_MAJOR} * 10000) + (${NUMPY_VERSION_MINOR} * 100) + ${NUMPY_VERSION_PATCH}")
+string(REGEX REPLACE "\\." ";" _NumPy_VERSION_LIST ${NumPy_VERSION})
+list(GET _NumPy_VERSION_LIST 0 NumPy_VERSION_MAJOR)
+list(GET _NumPy_VERSION_LIST 1 NumPy_VERSION_MINOR)
+list(GET _NumPy_VERSION_LIST 2 NumPy_VERSION_PATCH)
+string(REGEX MATCH "[0-9]*" NumPy_VERSION_PATCH ${NumPy_VERSION_PATCH})
+math(EXPR NumPy_VERSION_DECIMAL
+    "(${NumPy_VERSION_MAJOR} * 10000) + (${NumPy_VERSION_MINOR} * 100) + ${NumPy_VERSION_PATCH}")
 
-find_package_message(NUMPY
-    "Found NumPy: version \"${NUMPY_VERSION}\" ${NUMPY_INCLUDE_DIRS}"
-    "${NUMPY_INCLUDE_DIRS}${NUMPY_VERSION}")
+find_package_message(NumPy
+    "Found NumPy: version \"${NumPy_VERSION}\" ${NumPy_INCLUDE_DIRS}"
+    "${NumPy_INCLUDE_DIRS}${NumPy_VERSION}")
 
-set(NUMPY_FOUND TRUE)
-
+set(NumPy_FOUND TRUE)
