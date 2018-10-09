@@ -105,11 +105,14 @@ private:
         Py_DECREF(pylabname);
         if(!pylabmod) { throw std::runtime_error("Error loading module pylab!"); }
 
-        std::vector<char const*> const function_names = {"show", "close",
-            "draw", "pause", "figure", "plot", "semilogx", "semilogy", "loglog",
-            "fill_between", "hist", "subplot", "legend", "xlim", "ylim", "title",
-            "axis", "xlabel", "ylabel", "grid", "ion", "savefig", "annotate",
-            "clf", "errorbar", "tight_layout", "stem", "xkcd", "scatter"};
+        std::vector<char const *> const function_names = {
+            "show",         "close",  "draw",     "pause",        "figure",
+            "plot",         "quiver", "semilogx", "semilogy",     "loglog",
+            "fill_between", "hist",   "subplot",  "legend",       "ylim",
+            "title",        "axis",   "xlabel",   "ylabel",       "xticks",
+            "yticks",       "grid",   "xlim",     "ion",          "savefig",
+            "annotate",     "clf",    "errorbar", "tight_layout", "stem",
+            "xkcd",         "scatter"};
 
         for(size_t i = 0; i < function_names.size(); ++i)
         {
@@ -389,6 +392,38 @@ bool plot(const std::vector<NumericX>& x, const std::vector<NumericY>& y, const 
     return res;
 }
 
+template<typename NumericX, typename NumericY, typename NumericU, typename NumericW>
+bool quiver(const std::vector<NumericX>& x, const std::vector<NumericY>& y, const std::vector<NumericU>& u, const std::vector<NumericW>& w, const std::map<std::string, std::string>& keywords = {})
+{
+    assert(x.size() == y.size() && x.size() == u.size() && u.size() == w.size());
+
+    PyObject* xarray = get_array(x);
+    PyObject* yarray = get_array(y);
+    PyObject* uarray = get_array(u);
+    PyObject* warray = get_array(w);
+
+    PyObject* plot_args = PyTuple_New(4);
+    PyTuple_SetItem(plot_args, 0, xarray);
+    PyTuple_SetItem(plot_args, 1, yarray);
+    PyTuple_SetItem(plot_args, 2, uarray);
+    PyTuple_SetItem(plot_args, 3, warray);
+
+    // construct keyword args
+    PyObject* kwargs = PyDict_New();
+    for(std::map<std::string, std::string>::const_iterator it = keywords.begin(); it != keywords.end(); ++it)
+    {
+        PyDict_SetItemString(kwargs, it->first.c_str(), PyUnicode_FromString(it->second.c_str()));
+    }
+
+    PyObject* res = PyObject_Call(detail::_interpreter::get().python_functions["quiver"], plot_args, kwargs);
+
+    Py_DECREF(plot_args);
+    if (res)
+        Py_DECREF(res);
+
+    return res;
+}
+
 template<typename NumericX, typename NumericY>
 bool stem(const std::vector<NumericX>& x, const std::vector<NumericY>& y, const std::string& s = "")
 {
@@ -484,7 +519,7 @@ bool loglog(const std::vector<NumericX>& x, const std::vector<NumericY>& y, cons
 }
 
 template<typename NumericX, typename NumericY>
-bool errorbar(const std::vector<NumericX> &x, const std::vector<NumericY> &y, const std::vector<NumericX> &yerr, const std::string &fmt = "")
+bool errorbar(const std::vector<NumericX> &x, const std::vector<NumericY> &y, const std::vector<NumericX> &yerr, const std::map<std::string, std::string> &keywords = {})
 {
     assert(x.size() == y.size());
 
@@ -492,12 +527,14 @@ bool errorbar(const std::vector<NumericX> &x, const std::vector<NumericY> &y, co
     PyObject* yarray = get_array(y);
     PyObject* yerrarray = get_array(yerr);
 
-    PyObject *kwargs = PyDict_New();
+    // construct keyword args
+    PyObject* kwargs = PyDict_New();
+    for(std::map<std::string, std::string>::const_iterator it = keywords.begin(); it != keywords.end(); ++it)
+    {
+        PyDict_SetItemString(kwargs, it->first.c_str(), PyString_FromString(it->second.c_str()));
+    }
 
     PyDict_SetItemString(kwargs, "yerr", yerrarray);
-
-    PyObject *pystring = PyString_FromString(fmt.c_str());
-    PyDict_SetItemString(kwargs, "fmt", pystring);
 
     PyObject *plot_args = PyTuple_New(2);
     PyTuple_SetItem(plot_args, 0, xarray);
@@ -816,6 +853,100 @@ inline double* ylim()
 
     Py_DECREF(res);
     return arr;
+}
+
+template<typename Numeric>
+inline void xticks(const std::vector<Numeric> &ticks, const std::vector<std::string> &labels = {}, const std::map<std::string, std::string>& keywords = {})
+{
+    assert(labels.size() == 0 || ticks.size() == labels.size());
+
+    // using numpy array
+    PyObject* ticksarray = get_array(ticks);
+
+    PyObject* args;
+    if(labels.size() == 0) {
+        // construct positional args
+        args = PyTuple_New(1);
+        PyTuple_SetItem(args, 0, ticksarray);
+    } else {
+        // make tuple of tick labels
+        PyObject* labelstuple = PyTuple_New(labels.size());
+        for (size_t i = 0; i < labels.size(); i++)
+            PyTuple_SetItem(labelstuple, i, PyUnicode_FromString(labels[i].c_str()));
+
+        // construct positional args
+        args = PyTuple_New(2);
+        PyTuple_SetItem(args, 0, ticksarray);
+        PyTuple_SetItem(args, 1, labelstuple);
+    }
+
+    // construct keyword args
+    PyObject* kwargs = PyDict_New();
+    for(std::map<std::string, std::string>::const_iterator it = keywords.begin(); it != keywords.end(); ++it)
+    {
+        PyDict_SetItemString(kwargs, it->first.c_str(), PyString_FromString(it->second.c_str()));
+    }
+
+    PyObject* res = PyObject_Call(detail::_interpreter::get().python_functions["xticks"], args, kwargs);
+
+    Py_DECREF(args);
+    Py_DECREF(kwargs);
+    if(!res) throw std::runtime_error("Call to xticks() failed");
+
+    Py_DECREF(res);
+}
+
+template<typename Numeric>
+inline void xticks(const std::vector<Numeric> &ticks, const std::map<std::string, std::string>& keywords)
+{
+    xticks(ticks, {}, keywords);
+}
+
+template<typename Numeric>
+inline void yticks(const std::vector<Numeric> &ticks, const std::vector<std::string> &labels = {}, const std::map<std::string, std::string>& keywords = {})
+{
+    assert(labels.size() == 0 || ticks.size() == labels.size());
+
+    // using numpy array
+    PyObject* ticksarray = get_array(ticks);
+
+    PyObject* args;
+    if(labels.size() == 0) {
+        // construct positional args
+        args = PyTuple_New(1);
+        PyTuple_SetItem(args, 0, ticksarray);
+    } else {
+        // make tuple of tick labels
+        PyObject* labelstuple = PyTuple_New(labels.size());
+        for (size_t i = 0; i < labels.size(); i++)
+            PyTuple_SetItem(labelstuple, i, PyUnicode_FromString(labels[i].c_str()));
+
+        // construct positional args
+        args = PyTuple_New(2);
+        PyTuple_SetItem(args, 0, ticksarray);
+        PyTuple_SetItem(args, 1, labelstuple);
+    }
+
+    // construct keyword args
+    PyObject* kwargs = PyDict_New();
+    for(std::map<std::string, std::string>::const_iterator it = keywords.begin(); it != keywords.end(); ++it)
+    {
+        PyDict_SetItemString(kwargs, it->first.c_str(), PyString_FromString(it->second.c_str()));
+    }
+
+    PyObject* res = PyObject_Call(detail::_interpreter::get().python_functions["yticks"], args, kwargs);
+
+    Py_DECREF(args);
+    Py_DECREF(kwargs);
+    if(!res) throw std::runtime_error("Call to yticks() failed");
+
+    Py_DECREF(res);
+}
+
+template<typename Numeric>
+inline void yticks(const std::vector<Numeric> &ticks, const std::map<std::string, std::string>& keywords)
+{
+    yticks(ticks, {}, keywords);
 }
 
 inline void subplot(long nrows, long ncols, long plot_number)

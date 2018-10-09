@@ -64,6 +64,9 @@ if(MATPLOTLIBCPP_EXAMPLES)
     add_executable(nonblock "examples/nonblock.cpp")
     target_link_libraries(nonblock matplotlibcpp)
 
+    add_executable(quiver "examples/quiver.cpp")
+    target_link_libraries(quiver matplotlibcpp)
+
     add_executable(xkcd "examples/xkcd.cpp")
     target_link_libraries(xkcd matplotlibcpp)
 endif(MATPLOTLIBCPP_EXAMPLES)
