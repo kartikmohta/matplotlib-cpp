@@ -15,6 +15,8 @@ int main()
         }
     }
 
+    plt::init(); // Required for Python 3 (doesn't hurt for Python 2)
+
     plt::quiver(x, y, u, v);
     plt::show();
 }

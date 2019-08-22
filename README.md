@@ -30,7 +30,7 @@ A more comprehensive example:
 
 namespace plt = matplotlibcpp;
 
-int main() 
+int main()
 {
     // Prepare data.
     int n = 5000;
@@ -65,7 +65,7 @@ int main()
 
 ![Basic example](./examples/basic.png)
 
-matplotlib-cpp doesn't require C++11, but will enable some additional syntactic sugar when available:
+Alternatively, matplotlib-cpp also supports some C++11-powered syntactic sugar:
 ```cpp
 #include <cmath>
 #include "matplotlibcpp.h"
@@ -73,26 +73,26 @@ matplotlib-cpp doesn't require C++11, but will enable some additional syntactic 
 using namespace std;
 namespace plt = matplotlibcpp;
 
-int main() 
-{    
+int main()
+{
     // Prepare data.
     int n = 5000; // number of data points
-    vector<double> x(n),y(n); 
+    vector<double> x(n),y(n);
     for(int i=0; i<n; ++i) {
         double t = 2*M_PI*i/n;
         x.at(i) = 16*sin(t)*sin(t)*sin(t);
         y.at(i) = 13*cos(t) - 5*cos(2*t) - 2*cos(3*t) - cos(4*t);
     }
 
-    // plot() takes an arbitrary number of (x,y,format)-triples. 
+    // plot() takes an arbitrary number of (x,y,format)-triples.
     // x must be iterable (that is, anything providing begin(x) and end(x)),
-    // y must either be callable (providing operator() const) or iterable. 
+    // y must either be callable (providing operator() const) or iterable.
     plt::plot(x, y, "r-", x, [](double d) { return 12.5+abs(sin(d)); }, "k-");
 
 
     // show plots
     plt::show();
-} 
+}
 ```
     g++ modern.cpp -std=c++11 -I/usr/include/python2.7 -lpython
 
@@ -132,7 +132,7 @@ int main() {
 
 When working with vector fields, you might be interested in quiver plots:
 ```cpp
-#include "../matplotlibcpp.h"
+#include "matplotlibcpp.h"
 
 namespace plt = matplotlibcpp;
 
@@ -158,6 +158,36 @@ int main()
 **Result:**
 
 ![quiver example](./examples/quiver.png)
+
+When working with 3d functions, you might be interested in 3d plots:
+```cpp
+#include "matplotlibcpp.h"
+
+namespace plt = matplotlibcpp;
+
+int main()
+{
+    std::vector<std::vector<double>> x, y, z;
+    for (double i = -5; i <= 5;  i += 0.25) {
+        std::vector<double> x_row, y_row, z_row;
+        for (double j = -5; j <= 5; j += 0.25) {
+            x_row.push_back(i);
+            y_row.push_back(j);
+            z_row.push_back(::std::sin(::std::hypot(i, j)));
+        }
+        x.push_back(x_row);
+        y.push_back(y_row);
+        z.push_back(z_row);
+    }
+
+    plt::plot_surface(x, y, z);
+    plt::show();
+}
+```
+
+**Result:**
+
+![surface example](./examples/surface.png)
 
 Installation
 ------------
@@ -186,6 +216,16 @@ find_package(PythonLibs 2.7)
 target_include_directories(myproject PRIVATE ${PYTHON_INCLUDE_DIRS})
 target_link_libraries(myproject ${PYTHON_LIBRARIES})
 ```
+
+# C++11
+
+Currently, c++11 is required to build matplotlib-cpp. The last working commit that did
+not have this requirement was `717e98e752260245407c5329846f5d62605eff08`.
+
+Note that support for c++98 was dropped more or less accidentally, so if you have to work
+with an ancient compiler and still want to enjoy the latest additional features, I'd
+probably merge a PR that restores support.
+
 # Python 3
 
 This library supports both python2 and python3 (although the python3 support is probably far less tested,
@@ -201,10 +241,10 @@ The same technique can be used for linking against a custom build of python
 
 Why?
 ----
-I initially started this library during my diploma thesis. The usual approach of 
+I initially started this library during my diploma thesis. The usual approach of
 writing data from the c++ algorithm to a file and afterwards parsing and plotting
 it in python using matplotlib proved insufficient: Keeping the algorithm
-and plotting code in sync requires a lot of effort when the C++ code frequently and substantially 
+and plotting code in sync requires a lot of effort when the C++ code frequently and substantially
 changes. Additionally, the python yaml parser was not able to cope with files that
 exceed a few hundred megabytes in size.
 
