@@ -6,7 +6,12 @@ set(CMAKE_CXX_STANDARD 11)
 
 LIST(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
+# Call find_package(PythonInterp) first to get the currently active Python version and use that for
+# setting the version to find for find_package(PythonLibs)
+find_package(PythonInterp REQUIRED)
+set(Python_ADDITIONAL_VERSIONS ${PYTHON_VERSION_STRING})
 find_package(PythonLibs REQUIRED)
+
 find_package(NumPy REQUIRED) # In case numpy headers are at non-standard locations
 
 add_library(${PROJECT_NAME} INTERFACE)
@@ -36,7 +41,7 @@ include(cmake/GenerateAndInstallConfig.cmake)
 generate_and_install_config_file(
   INCLUDE_DIRS "include"
   LIBRARIES
-  DEPS PythonLibs NumPy
+  DEPS "PythonLibs ${Python_ADDITIONAL_VERSIONS}" NumPy
   DEPS_INCLUDE_DIRS PYTHON NumPy
   DEPS_LIBRARIES PYTHON
   )
