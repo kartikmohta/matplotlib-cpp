@@ -79,6 +79,9 @@ if(MATPLOTLIBCPP_EXAMPLES)
     add_executable(subplot "examples/subplot.cpp")
     target_link_libraries(subplot matplotlibcpp)
 
+    add_executable(subplot2grid "examples/subplot2grid.cpp")
+    target_link_libraries(subplot2grid matplotlibcpp)
+
     add_executable(surface "examples/surface.cpp")
     target_link_libraries(surface matplotlibcpp)
 

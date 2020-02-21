@@ -211,6 +211,21 @@ matplotlib-cpp.
 
 If you prefer to use CMake as build system, you will want to add something like this to your
 CMakeLists.txt:
+
+**Recommended way (since CMake 3.12):**
+
+It's easy to use cmake official [docs](https://cmake.org/cmake/help/git-stage/module/FindPython2.html#module:FindPython2) to find Python 2(or 3) interpreter, compiler and development environment (include directories and libraries).
+
+NumPy is optional here, delete it from cmake script, if you don't need it.
+
+```cmake
+find_package(Python2 COMPONENTS Development NumPy)
+target_include_directories(myproject PRIVATE ${Python2_INCLUDE_DIRS} ${Python2_NumPy_INCLUDE_DIRS})
+target_link_libraries(myproject Python2::Python Python2::NumPy)
+```
+
+**Alternative way (for CMake <= 3.11):**
+
 ```cmake
 find_package(PythonLibs 2.7)
 target_include_directories(myproject PRIVATE ${PYTHON_INCLUDE_DIRS})
@@ -273,3 +288,6 @@ Todo/Issues/Wishlist
 
 * If you use Anaconda on Windows, you might need to set PYTHONHOME to Anaconda home directory and QT_QPA_PLATFORM_PLUGIN_PATH to %PYTHONHOME%Library/plugins/platforms. The latter is for especially when you get the error which says 'This application failed to start because it could not find or load the Qt platform plugin "windows"
 in "".'
+
+* MacOS: `Unable to import matplotlib.pyplot`. Cause: In mac os image rendering back end of matplotlib (what-is-a-backend to render using the API of Cocoa by default). There is Qt4Agg and GTKAgg and as a back-end is not the default. Set the back end of macosx that is differ compare with other windows or linux os.
+Solution is discribed [here](https://stackoverflow.com/questions/21784641/installation-issue-with-matplotlib-python?noredirect=1&lq=1), additional information can be found there too(see links in answers).
